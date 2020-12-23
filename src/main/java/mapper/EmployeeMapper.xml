@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.EmployeeDao">
+    <select id="allEmployee" parameterType="entity.Employee" resultType="vo.EmployeeVO">
+        SELECT te.id id,
+        address_id,
+        CONCAT(ap.province_name, '-', ac.city_name, '-', aa.area_name) address,
+        birthday,
+        cardid,
+        createDate,
+        education,
+        email,
+        gender,
+        te.name name,
+        party,
+        phone,
+        postCode,
+        qqNum,
+        speciality,
+        did,
+        td.name dName,
+        jid,
+        tj.name jName,
+        uid
+        FROM tb_employee te
+        LEFT JOIN tb_dept td on te.did = td.id
+        LEFT JOIN tb_job tj on te.jid = tj.id
+        LEFT JOIN address_area aa on address_id = aa.id
+        LEFT JOIN address_city ac on aa.parent_city_code = ac.city_code
+        LEFT JOIN address_province ap on ac.parent_province_code = ap.province_code
+        <where>
+            <if test="did != null">AND did = #{did}</if>
+            <if test="name != null">AND te.name LIKE CONCAT('%', #{name}, '%')</if>
+            <if test="cardid != null">AND cardid LIKE CONCAT('%', #{cardid}, '%')</if>
+            <if test="jid != null">AND jid = #{jid}</if>
+            <if test="gender != null">AND gender = #{gender}</if>
+            <if test="phone != null">AND phone LIKE CONCAT('%', #{phone}, '%')</if>
+            <if test="id != null">AND te.id = #{id}</if>
+        </where>
+    </select>
+
+    <update id="updateEmployee" parameterType="entity.Employee">
+        update tb_employee
+        <set>
+            <if test="birthday != null">
+                birthday = #{birthday},
+            </if>
+            <if test="cardId != null">
+                cardId = #{cardId},
+            </if>
+            <if test="createDate != null">
+                createDate = #{createDate},
+            </if>
+            <if test="education != null">
+                education = #{education},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="party != null">
+                party = #{party},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="postCode != null">
+                postCode = #{postCode},
+            </if>
+            <if test="qqNum != null">
+                qqNum = #{qqNum},
+            </if>
+            <if test="speciality != null">
+                speciality = #{speciality},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <insert id="addEmployee" parameterType="entity.Employee">
+        insert into tb_employee (
+        <trim suffixOverrides=",">
+            <if test="birthday != null">
+                birthday,
+            </if>
+            <if test="cardId != null">
+                cardId,
+            </if>
+            <if test="createDate != null">
+                createDate,
+            </if>
+            <if test="education != null">
+                education,
+            </if>
+            <if test="email != null">
+                email,
+            </if>
+            <if test="gender != null">
+                gender,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="party != null">
+                party,
+            </if>
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="postCode != null">
+                postCode,
+            </if>
+            <if test="qqNum != null">
+                qqNum,
+            </if>
+            <if test="speciality != null">
+                speciality,
+            </if>
+        </trim>
+        ) values (
+        <trim suffixOverrides=",">
+            <if test="birthday != null">
+                #{birthday},
+            </if>
+            <if test="cardId != null">
+                #{cardId},
+            </if>
+            <if test="createDate != null">
+                #{createDate},
+            </if>
+            <if test="education != null">
+                #{education},
+            </if>
+            <if test="email != null">
+                #{email},
+            </if>
+            <if test="gender != null">
+                #{gender},
+            </if>
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="party != null">
+                #{party},
+            </if>
+            <if test="phone != null">
+                #{phone},
+            </if>
+            <if test="postCode != null">
+                #{postCode},
+            </if>
+            <if test="qqNum != null">
+                #{qqNum},
+            </if>
+            <if test="speciality != null">
+                #{speciality},
+            </if>
+        </trim>
+        )
+    </insert>
+
+    <delete id="deleteById" parameterType="list">
+        delete from tb_employee where id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

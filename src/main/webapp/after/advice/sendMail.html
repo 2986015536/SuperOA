@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>发送邮件</title>
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <script src="../../layui/layui.js"></script>
+    <script src="../../js/jquery-1.12.2.min.js" ></script>
+</head>
+<body>
+<form class="layui-form">
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">收件人：</label>
+        <div class="layui-input-block">
+            <input type="text" name="recipient" lay-verify="email" lay-reqtext="收件人是必填项，不能为空！" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">邮件标题：</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" lay-verify="required|con1" lay-reqtext="邮件标题是必填项，不能为空！" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">邮件内容：</label>
+        <div class="layui-input-block">
+            <textarea  name="content" lay-verify="required|con" placeholder="请输入内容" class="layui-textarea"></textarea>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1">立即发送</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+
+<!--    收件人：<input type="text" name="recipient">-->
+<!--    邮件标题：<input type="text" name="title">-->
+<!--    邮件内容：<input type="text" name="content">-->
+<!--    <input type="submit" value="发送">-->
+</form>
+</body>
+</html>
+<!--<script>-->
+<!--    $("form").submit(function () {-->
+<!--        $.ajax({-->
+<!--            async: false,//同步请求-->
+<!--            type: "post",   //提交的方法-->
+<!--            url:"/OA/mail/sendMail.do", //提交的地址-->
+<!--            data:$("form").serialize(),// 序列化表单值-->
+<!--            dataType:"JSON",-->
+<!--            success:function (data) {-->
+<!--                console.log(data);-->
+<!--                alert(data.info);-->
+<!--            },-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->
+
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function() {
+        var form = layui.form
+            , layer = layui.layer
+            , layedit = layui.layedit;
+
+
+        //监听提交
+        form.on('submit(demo1)', function(data){
+            $.ajax({
+                async: false,//同步请求
+                type: "post",   //提交的方法
+                url:"/SuperOA/mail/sendMail.do", //提交的地址
+                data:$("form").serialize(),// 序列化表单值
+
+                dataType:"JSON",
+                success:function (data) {
+                    console.log(data);
+                    alert(data.info);
+                },
+            });
+        });
+    });
+</script>

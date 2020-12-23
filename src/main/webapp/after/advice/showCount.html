@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户公告</title>
+    <script type="text/javascript" src="../../js/echarts.min.js"></script>
+    <script type="text/javascript" src="../../js/jquery-1.12.2.min.js"></script>
+</head>
+<body>
+
+
+<div>
+    <div id="dv1" style="width: 500px; float:left; height: 500px"></div>
+    <div id="dv2" style="width: 500px; float:left; height: 500px"></div>
+</div>
+</body>
+<script type="application/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart1 = echarts.init(document.getElementById('dv1'));
+
+    // 指定图表的配置项和数据
+    var option1 = {
+        title: {
+            text: '用户公告发送量统计'
+        },
+        tooltip: {},
+        legend: {
+            data:['发送量']
+        },
+        xAxis: {
+            data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
+        },
+        yAxis: {},
+        series: [{
+            name: '发送量',
+            type: 'bar',
+            data: [5, 20, 36, 10, 10, 20]
+        }]
+    };
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChart1.setOption(option1);
+</script>
+
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart2 = echarts.init(document.getElementById('dv2'));
+
+    option2 = {
+
+        title: {
+            text: '柱状图'
+        },
+        angleAxis: {
+            type: 'category',
+            data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+        },
+        radiusAxis: {
+        },
+        polar: {
+        },
+        series: [{
+            type: 'bar',
+            data: [1, 2, 3, 4, 3, 5, 1],
+            coordinateSystem: 'polar',
+            name: '发送量',
+            stack: 'a'
+        }],
+        legend: {
+            show: true,
+            data: ['发送量', 'B', 'C']
+        }
+    };
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChart2.setOption(option2);
+
+    $.ajax({
+        type:"post",
+        url:"/SuperOA/advices/echarts1.do",
+        dataType:"json",
+        success:function (res) {
+            console.log(res)
+            option1.xAxis.data = res.users;
+            option1.series[0].data = res.counts;
+            myChart1.setOption(option1);
+            option2.angleAxis.data = res.users;
+            option2.series[0].data = res.counts;
+            myChart2.setOption(option2);
+        }
+    })
+</script>
+
+
+</html>

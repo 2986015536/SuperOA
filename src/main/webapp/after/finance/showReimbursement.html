@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>人事管理系统</title>
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <script src="../../layui/layui.js"></script>
+    <script src="../../js/jquery-1.12.2.min.js"></script>
+
+    <style >
+        *{
+            padding: 0;
+            margin:0;
+        }
+        #dVName{
+            margin-top: 25px;
+            margin-left: 10px;
+        }
+
+        #formDept {
+            margin-left: 10px;
+            margin-top: 40px;
+            padding-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+
+<div id="content">
+    <div class="layui-form  serchDiv">
+
+        <div class="layui-form-item " id="dVName">
+
+            <div class="layui-inline">
+                <label class="layui-form-label">报销项名</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="Aname"  placeholder="请输入报销项目名" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="layui-inline">
+                <label class="layui-form-label">开始日期</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="test1" placeholder="yyyy-MM-dd"  autocomplete="off">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">结束日期</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="test2" placeholder="yyyy-MM-dd"  autocomplete="off">
+                </div>
+            </div>
+
+
+            <button class="layui-btn" data-type="reload">搜索</button>
+        </div>
+
+    </div>
+
+
+    <table class="layui-hide  layui-laypage-#FF5722 " id="test" lay-filter="test"></table>
+
+
+</div>
+
+</body>
+
+
+<!--表外标签-->
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container demoTable">
+        <button class="layui-btn layui-btn-sm" lay-event="addR" id="btn"><i class="layui-icon layui-icon-add-circle-fine" style="font-size:20px;font-weight:bold"></i> 新增报销</button>
+    </div>
+</script>
+
+
+<!--表中标签-->
+<script type="text/html" id="barDemo">
+    <div>
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看简介</a>
+    </div>
+</script>
+
+
+
+<script>
+
+    layui.use(['table', "laypage", "layer", 'carousel', 'upload', 'element', 'slider','form','laydate'], function() {
+        //初始化table组件对象
+        var table = layui.table
+            , form = layui.form
+            , laypage = layui.laypage//分页的组件
+            , layer = layui.layer//弹框
+            , laydate = layui.laydate//日期组件
+            , element = layui.element;//元素的操作
+
+
+        // 常规用法 渲染那个时间框的！！！
+        laydate.render({
+            elem: '#test1'
+            , theme: '#FFB800'
+        });
+        //常规用法
+        laydate.render({
+            elem: '#test2'
+            , theme: '#f10215'
+        });
+
+
+        //渲染table
+        table.render({
+            //z找到table  id叫test的组件
+            elem: '#test'
+            , id: "transferTable"
+            , url: '../../reim/selectReimbursement.do'
+            , totalRow: true
+            , toolbar: '#toolbarDemo'
+            //这个很关键，就是解析 json数据库中数据的 一定要注意键值
+            , cols: [[
+                {checkbox: true, fixed: true}
+                , {field: 'id', title: '报销单编号', width: 120, unresize: true, sort: true, fixed: "left"}
+                , {field: 'name', title: '报销项名', width: 180, sort: true}
+                , {field: 'money', title: '报销金额', width: 140, sort: true}
+                , {
+                    field: 'date',
+                    title: '上报日期',
+                    width: 140,
+                    sort: true,
+                    templet: "<div>{{layui.util.toDateString(d.date, 'yyyy-MM-dd ')}}</div>"
+                }
+                , {field: 'status', title: '当前状态', width: 120, sort: true}
+                , {field: 'ename', title: '上报人', width: 100, sort: true}
+                , {field: 'jname', title: '上报人职务', width: 120, sort: true}
+                , {field: 'dname', title: '上报人部门', width: 120, sort: true}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 200, align: "center"}
+
+            ]]
+            , page: {theme: '#888888', layout: ['limit', 'count', 'prev', 'page', 'next', 'skip']}//分页开启
+
+
+        });
+
+
+        //搜索框有效果的情况
+        var active = {
+            reload: function () {
+                //执行重载
+                table.reload('transferTable', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                        , theme: '#888888'
+                    }
+                    , where: {//额外需要提交的参数
+
+                        name: $("#Aname").val(),
+                        beginTime: $("#test1").val(),
+                        endTime: $("#test2").val(),
+
+                    }
+                });
+            }
+        };
+
+        $('.serchDiv .layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            console.log(type);
+            active[type] ? active[type].call(this) : '';
+
+        });
+
+
+        //监听行工具事件
+        table.on('tool(test)', function(obj){
+            var id = obj.data.id;
+             if(obj.event === 'detail'){
+                layer.msg("申报人 " + obj.data.ename );
+            }
+        });
+
+
+
+        //头工具栏事件
+        table.on('toolbar(test)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case  'addR':
+                    window.parent.pClick("addReim");
+
+            };
+
+        });
+    });
+
+
+</script>
+</html>

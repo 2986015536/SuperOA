@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>文件上传</title>
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <script type="text/javascript" src="../../layui/layui.js"></script>
+    <script type="text/javascript" src="../../js/jquery-1.12.2.min.js" ></script>
+</head>
+<body>
+<div class="layui-upload">
+    <button type="button" class="layui-btn layui-btn-normal" id="testList">选择多文件</button>
+    <div class="layui-upload-list">
+        <table class="layui-table">
+            <thead>
+            <tr><th>文件名</th>
+                <th>大小</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr></thead>
+            <tbody id="demoList"></tbody>
+        </table>
+    </div>
+    <button type="button" class="layui-btn" id="testListAction">开始上传</button>
+</div>
+<div>
+
+</div>
+<fieldset class="layui-elem-field site-demo-button" style="margin-top: 80px;">
+    <form class="layui-form" action="">
+    <div>
+        <button type="button" class="layui-btn layui-btn-warm">文件下载</button>
+        <div class="layui-input-block">
+            <input type="text" name="num" lay-verify="required" lay-reqtext="用户名是必填项，岂能为空？" placeholder="请输入下载数量" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</fieldset>
+</body>
+<script>
+    layui.use(['upload','form'], function(){
+        var $ = layui.jquery
+            ,upload = layui.upload
+        ,form = layui.form;
+
+        form.verify({
+            required:function (value) {
+                // 正则表达式
+                var reg = /^\d+$/
+                console.log(value)
+                // 判断 是否是字符串 数字
+                if (value.match(reg)) {
+                    if (value < 0 || value > 10000) {
+                        return '下载数量不能超过一万条或输入数量不正确'
+                    }
+
+                } else {
+                    return '输入数字不合法'
+                }
+            }
+        });
+
+
+        //监听提交
+        form.on('submit(demo1)', function(data){
+            console.log(data.field.num)
+           window.location.href="/SuperOA/file/down.do?num="+ data.field.num
+
+
+            return false;
+        });
+
+        //多文件列表示例
+        var demoListView = $('#demoList')
+            ,uploadListIns = upload.render({
+            elem: '#testList'
+            ,url: '/SuperOA/file/batch.do' //改成您自己的上传接口
+            ,accept: 'file'
+            ,multiple: true
+            ,auto: false
+            ,bindAction: '#testListAction'
+            ,choose: function(obj){
+                var files = this.files = obj.pushFile(); //将每次选择的文件追加到文件队列
+                //读取本地文件
+                obj.preview(function(index, file, result){
+                    var tr = $(['<tr id="upload-'+ index +'">'
+                        ,'<td>'+ file.name +'</td>'
+                        ,'<td>'+ (file.size/1024).toFixed(1) +'kb</td>'
+                        ,'<td>等待上传</td>'
+                        ,'<td>'
+                        ,'<button class="layui-btn layui-btn-xs demo-reload layui-hide">重传</button>'
+                        ,'<button class="layui-btn layui-btn-xs layui-btn-danger demo-delete">删除</button>'
+                        ,'</td>'
+                        ,'</tr>'].join(''));
+
+                    //单个重传
+                    tr.find('.demo-reload').on('click', function(){
+                        obj.upload(index, file);
+                    });
+
+                    //删除
+                    tr.find('.demo-delete').on('click', function(){
+                        delete files[index]; //删除对应的文件
+                        tr.remove();
+                        uploadListIns.config.elem.next()[0].value = ''; //清空 input file 值，以免删除后出现同名文件不可选
+                    });
+
+                    demoListView.append(tr);
+                });
+            }
+            ,done: function(res, index, upload){
+                alert("上传成功")
+
+                    var tr = demoListView.find('tr#upload-'+ index)
+                        ,tds = tr.children();
+                    tds.eq(2).html('<span style="color: #5FB878;">上传成功</span>');
+                    tds.eq(3).html(''); //清空操作
+                    return delete this.files[index]; //删除文件队列已经上传成功的文件
+
+                this.error(index, upload);
+            }
+            ,error: function(index, upload){
+                var tr = demoListView.find('tr#upload-'+ index)
+                    ,tds = tr.children();
+                tds.eq(2).html('<span style="color: #FF5722;">上传失败</span>');
+                tds.eq(3).find('.demo-reload').removeClass('layui-hide'); //显示重传
+            }
+        });
+    });
+</script>
+
+</html>

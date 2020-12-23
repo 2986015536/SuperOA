@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>人事管理系统</title>
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <script src="../../layui/layui.js"></script>
+    <script src="../../js/jquery-1.12.2.min.js"></script>
+
+    <style >
+        *{
+            padding: 0;
+            margin:0;
+        }
+        #dvName{
+            margin-top: 25px;
+            margin-left: 10px;
+        }
+
+        #formDept {
+            margin-left: 10px;
+            margin-top: 40px;
+            padding-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+
+<div id="content">
+    <div class="layui-form  serchDiv">
+        <div class="layui-form-item " id="dvName">
+            <div class="layui-inline">
+                <label class="layui-form-label">部门名字</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="dname" placeholder="请输入部门名">
+                </div>
+            </div>
+            <button class="layui-btn" data-type="reload">搜索</button>
+        </div>
+    </div>
+
+
+    <table class="layui-hide  layui-laypage-#FF5722 " id="test" lay-filter="test"></table>
+
+
+</div>
+
+</body>
+
+
+
+<!--表外标签-->
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container demoTable">
+        <button class="layui-btn layui-btn-sm" lay-event="addD" id="btn"><i class="layui-icon layui-icon-add-circle-fine" style="font-size:20px;font-weight:bold"></i> 新增部门</button>
+        <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="deleteAll" data-type="getCheckData"><i class="layui-icon layui-icon-delete" style="font-size:20px;"></i> 批量删除</button>
+    </div>
+</script>
+
+
+<!--表中标签-->
+<script type="text/html" id="barDemo">
+    <div>
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看简介</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </div>
+</script>
+
+<!-- 弹窗页面 -->
+<script type="text/html" id="layerHtml">
+    <form class="layui-form" id="formDept" method="post" onsubmit="return false;" lay-filter = "editForm">
+        <div class="layui-form">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">部门名称:</label>
+                    <div class="layui-input-inline">
+                        <!-- TODO id重复，修改数据的显示:placeholder -->
+                        <input type="tel" lay-verify="dname" class="layui-input" name="name" id="name">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <input type="hidden" name="id" value="'+id+'" class="layui-input">
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">详细描述:</label>
+                <div class="layui-input-block">
+                    <textarea placeholder="请输入内容" class="layui-textarea" id="remark" name="remark"
+                              lay-verify="remark"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="submit" class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</script>
+
+<script>
+
+    layui.use(['table', "laypage", "layer", 'carousel', 'upload', 'element', 'slider','form'], function(){
+        //初始化table组件对象
+        var table = layui.table
+            ,form = layui.form
+            ,laypage =layui.laypage//分页的组件
+            ,layer = layui.layer//弹框
+            ,laydate = layui.laydate//日期组件
+            ,element = layui.element;//元素的操作
+
+
+        form.verify({
+            dname: function (value) {
+                if (value.length == 0) {
+                    return '部门名不能为空';
+                }
+            },
+            remark: function (value) {
+                if (value.length == 0) {
+                    return "描述不能为空";
+                }
+            }
+        });
+
+
+
+        //渲染table
+        table.render({
+            //z找到table  id叫test的组件
+            elem: '#test'
+            ,id:"transferTable"
+            ,url:'../../dept/selectDept.do'
+            ,totalRow: true
+            ,toolbar: '#toolbarDemo'
+            //这个很关键，就是解析 json数据库中数据的 一定要注意键值
+            ,cols: [[
+                 {checkbox: true, fixed: true}
+                ,{field:'id', title:'部门编号', width:200,  unresize: true, sort: true, fixed:"left"}
+                ,{field:'dname', title:'部门名', width:100, sort: true}
+                ,{field:'remark', title:'简介', width:200,sort: true}
+                ,{field:'eNames', title:'部门人员', width:300,sort: true}
+                ,{field:'count', title:'部门人数', width:200,sort: true}
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:250 ,align:"center"}
+
+            ]]
+            ,page: {theme: '#888888', layout: ['limit', 'count', 'prev', 'page', 'next', 'skip']}//分页开启
+
+
+        });
+
+
+        //搜索框有效果的情况
+        var  active = {
+            reload: function(){
+                //执行重载
+                table.reload('transferTable', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                        ,theme: '#888888'
+                    }
+                    ,where: {//额外需要提交的参数
+
+                        dname:$("#dname").val(),
+
+                    }
+                });
+            }
+        };
+
+        $('.serchDiv .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            console.log(type);
+            active[type] ? active[type].call(this) : '';
+
+        });
+
+
+        //监听行工具事件
+        table.on('tool(test)', function(obj){
+            var did = obj.data.id;
+            console.log(did);
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    $.ajax({
+                        url:"../../dept/deleteDeptById.do",
+                        type:"post",
+                        data:{"did":did},
+                        dataType:'json',
+                        success:function(res) {
+                            if(res.code == 1) {
+                                alert("删除成功！");
+                                obj.del();
+                                layer.close(index);
+
+                            } else {
+                                layer.alert(res.info);
+                            }
+                        },
+                        error: function() {
+                            alert("ajax错误");
+                        }
+                    });
+
+
+                });
+            } else if(obj.event === 'edit'){
+                id = obj.data.id;
+                remark = obj.data.remark;
+                layer.open({
+                    type: 1,
+                    title:"修改部门内容",
+                    skin: 'layui-layer-lan', //样式类名
+                    closeBtn: 1, //显示关闭按钮
+                    anim: 4,
+                    shadeClose: true, //开启遮罩关闭
+                    content: layerHtml.innerHTML,
+                    area: ['500px', '400px'], //宽高
+
+                });
+
+                console.log(obj.data);
+
+                form.val("editForm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+
+                    "id": obj.data.id
+                    ,"name": obj.data.dname
+                    ,"remark": obj.data.remark
+
+                });
+
+
+
+
+                //监听提交
+                form.on('submit(formDemo)', function () {
+                    $.ajax({
+                        url: "../../dept/updateDept.do",
+                        data: $("form").serialize(),
+                        type: 'post',
+                        success: function (data) {
+                            if (data.code == 1) {
+                                layer.msg('修改成功', {icon: 1});
+                                setTimeout(function () {
+                                    window.location.reload() ;
+                                }, 2000);
+                            }else{
+                                console.log(a);
+                                alert($("form").serialize());
+
+                                layer.msg("修改失败", {icon: 2});
+                            }
+                        },
+                        error: function () {
+                            // alert($("form").serialize());
+                            layer.msg("修改失败", {icon: 2});
+                        }
+                    })
+                });
+            } else if(obj.event === 'detail'){
+                layer.msg('简介：'+ obj.data.remark );
+            }
+        });
+
+
+
+
+        //头工具栏事件
+        table.on('toolbar(test)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'deleteAll':
+
+                    var data = checkStatus.data;
+
+                    if(data.length !== 0){
+
+                    var dids = [];
+                    for (var i = 0;i<data.length;i++) {
+                        dids[i] = data[i].id;
+                    }
+                    var didArr = JSON.stringify(dids);
+                    console.log(JSON.stringify(dids));
+                    $.ajax({
+                        url:"../../dept/deleteDeptByIds.do",
+                        type:"post",
+                        data:{"dids":didArr},
+                        dataType:'json',
+                        success:function(res) {
+                            if(res.code == 1) {
+                                alert("删除成功！");
+                               window.location.reload();
+
+                            } else {
+                                layer.alert(res.info);
+                            }
+                        },
+                        error: function() {
+                            alert("ajax错误");
+                        }
+                    });
+                    } else {
+                        layer.msg("未选取任何数据", {icon: 2});
+                    }
+
+                    break;
+                case  'addD':
+                    window.parent.pClick("addDept");
+
+            };
+
+        });
+    });
+
+
+</script>
+</html>

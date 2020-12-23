@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户公告</title>
+    <script type="text/javascript" src="../js/echarts.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-1.12.2.min.js"></script>
+</head>
+<body>
+
+
+<div>
+    <div id="dv1" style="width: 1000px; float:left; height: 600px"></div>
+</div>
+</body>
+<script type="application/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart1 = echarts.init(document.getElementById('dv1'));
+
+    // 指定图表的配置项和数据
+    var option = {
+        title: {
+            text: '项目代码贡献图'
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985'
+                }
+            }
+        },
+        legend: {
+            data: ['郭东勃', '靳翔', '田旭阳','吴峰','王景','霍震峰','侯绍山', '韩智飞', '总代码量']
+        },
+        toolbox: {
+            feature: {
+                saveAsImage: {}
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: [
+            {
+                type: 'category',
+                boundaryGap: false,
+                data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value'
+            }
+        ],
+        series: [
+            {
+                name: '郭东勃',
+                type: 'line',
+                stack: '总量',
+                areaStyle: {},
+                data: [220, 300, 310, 350, 410, 480, 500]
+            },
+            {
+                name: '靳翔',
+                type: 'line',
+                stack: '总量',
+                areaStyle: {},
+                data: [270, 320, 330, 340, 400, 450, 490]
+            },
+            {
+                name: '田旭阳',
+                type: 'line',
+                stack: '总量',
+                areaStyle: {},
+                data: [280, 240, 270, 280, 350, 389, 410]
+            },
+            {
+                name: '吴峰',
+                type: 'line',
+                stack: '总量',
+                areaStyle: {},
+                data: [150, 160, 200, 220, 300, 315, 310]
+            },
+            {
+                name: '王景',
+                type: 'line',
+                stack: '总量',
+                areaStyle: {},
+                data: [230, 220, 260, 270, 350, 375, 380]
+            },
+            {
+                name: '霍震峰',
+                type: 'line',
+                stack: '总量',
+                areaStyle: {},
+                data: [220, 260, 290, 320, 380, 400, 390]
+            },
+            {
+                name: '侯绍山',
+                type: 'line',
+                stack: '总量',
+                areaStyle: {},
+                data: [150, 232, 245, 250, 310, 395, 370]
+            },
+            {
+                name: '韩智飞',
+                type: 'line',
+                stack: '总量',
+                areaStyle: {},
+                data: [320, 262, 301, 330, 380, 400, 420]
+            },
+            {
+                name: '总代码量',
+                type: 'line',
+                stack: '总量',
+                label: {
+                    normal: {
+                        show: true,
+                        position: 'top'
+                    }
+                },
+                areaStyle: {},
+                data: [1840, 1994, 2206, 2360, 2880, 2494, 3270]
+            }
+        ]
+    };
+
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChart1.setOption(option);
+</script>
+
+
+
+
+</html>

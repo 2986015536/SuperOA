@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.AddressDao">
+    <select id="selectProvinces" resultType="vo.AddressVO">
+        SELECT id addressId,
+               province_code addressCode,
+               province_name addressName
+        FROM address_province
+    </select>
+    <select id="selectCity" parameterType="string" resultType="vo.AddressVO">
+        select id addressId,
+                city_code  addressCode,
+                city_name addressName,
+                 parent_province_code addressParentCode
+                from address_city
+                where parent_province_code = #{provinceCode}
+    </select>
+    <select id="selectArea" parameterType="string" resultType="vo.AddressVO">
+        select id addressId,
+                area_code addressCode,
+                area_name addressName,
+                parent_city_code addressParentCode
+                from address_area
+                where parent_city_code = #{cityCode}
+    </select>
+</mapper>

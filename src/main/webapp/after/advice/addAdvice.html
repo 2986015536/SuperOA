@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加公告</title>
+
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <script type="text/javascript" src="../../layui/layui.js"></script>
+    <script type="text/javascript" src="../../js/jquery-1.12.2.min.js" ></script>
+</head>
+<body>
+    <form class="layui-form">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">公告标题：</label>
+            <div class="layui-input-block">
+                <input type="text" name="title" lay-verify="required" lay-reqtext="公告标题是必填项，不能为空！" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">公告内容：</label>
+            <div class="layui-input-block">
+                <textarea  name="content"  lay-verify="required" placeholder="请输入公告内容" class="layui-textarea"></textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+
+<!--        <label class="layui-form-label">公告标题：</label>-->
+<!--        <input type="text" lay-verify="required" lay-reqtext="用户名是必填项，岂能为空？" placeholder="请输入" autocomplete="off" class="layui-input" name="title"><br>-->
+
+<!--        公告内容：<input type="" name="content"><br>-->
+
+<!--        <input type="reset" value="重置">-->
+<!--        <input type="submit" value="发布">-->
+
+
+    </form>
+</body>
+</html>
+
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,laydate = layui.laydate;
+        //监听提交
+        form.on('submit(demo1)', function(data){
+
+            $.ajax({
+                async: false,//同步请求
+                type: "post",   //提交的方法
+                url:"/SuperOA/advices/addAdvice.do", //提交的地址
+                data:$("form").serialize(),// 序列化表单
+                dataType:"JSON",
+                success:function (data) {
+                    console.log(data);
+                    alert(data.info);
+                },
+            });
+        });
+
+    });
+
+</script>
+
+<!--<script>-->
+<!--    $("form").submit(function () {-->
+<!--        $.ajax({-->
+<!--            async: false,//同步请求-->
+<!--            type: "post",   //提交的方法-->
+<!--            url:"/OA/advice/addAdvice.do", //提交的地址-->
+<!--            data:$("form").serialize(),// 序列化表单-->
+<!--            dataType:"JSON",-->
+<!--            success:function (data) {-->
+<!--                console.log(data);-->
+<!--                alert(data.info);-->
+<!--            },-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->

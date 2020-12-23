@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="../../js/echarts.min.js"></script>
+    <script src="../../js/jquery-3.1.1.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+</head>
+<body>
+<div id="app">
+
+    <div v-for="item in infos" style="float: left; margin-left: 50px;border: #0e9aef 1px solid;">
+        <div>{{item.day}}</div><br>
+        <div>周{{item.weekday}}</div>
+
+
+        <div>白天</div><br>
+        <img v-bind:src="item.day_weather_pic" alt="" ><br>
+        <div id="dayAir">{{item.day_air_temperature}}</div><br>
+        <div id="dayWind">{{item.day_wind_direction}}_{{item.day_wind_power}}</div><br>
+
+        <div>晚上</div><br>
+        <img v-bind:src="item.night_weather_pic" alt="" ><br>
+        <div id="nightAir">{{item.night_air_temperature}}</div><br>
+        <div id="nightWind">{{item.night_wind_direction}}_{{item.night_wind_power}}</div><br>
+
+    </div>
+
+
+
+</div>
+
+<div  id="main" style="float:left;margin-top: 20px; width: 800px;height:600px;"></div>
+<script type="text/javascript">
+    $(function () {
+        a();
+        b();
+    });
+    var myChart = echarts.init(document.getElementById('main'));
+    function a() {
+        $.ajax({
+            async: false,//设置为同步请求
+            type: "get",
+            url: "/SuperOA/weather/select.do",
+            success: function (data) {
+                // console.log(data.dayAir);
+                // console.log(data.nightAir);
+                // console.log(data.day);
+                option = {
+                    title: {
+                        text: '未来七天郑州温度变化图'
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data: ['白天温度', '晚上温度']
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    toolbox: {
+                        feature: {
+                            saveAsImage: {}
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: data.day,
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [
+                        {
+                            name: '白天天气',
+                            type: 'line',
+                            stack: '总量',
+                            data: data.dayAir,
+                        },
+                        {
+                            name: '晚上温度',
+                            type: 'line',
+                            stack: '总量',
+                            data: data.nightAir,
+                        }
+                    ]
+                };
+
+                myChart.setOption(option);
+            }
+        })
+    }
+
+    function b() {
+        $.ajax({
+            async: false,//设置为同步请求
+            type: "get",
+            url: "/SuperOA/weather/selectqwe.do",
+            success: function (info) {
+                var vm = new Vue({
+                    el:"#app",
+                    data:{
+                        infos:info
+                    }
+                })
+
+            }
+        })
+    }
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

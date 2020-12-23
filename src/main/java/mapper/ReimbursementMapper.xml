@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.ReimbursementDao">
+    <!--    模糊查询-->
+    <select id="selectAllReimbursement" parameterType="map" resultType="vo.ReimbursementVo" >
+        select ar.id,ar.name name,ar.money,ar.date,ar.status,e.name ename,tj.name jname,td.name dname
+        from apply_reimbursement ar
+        left join tb_employee e on e.id = ar.employee_id
+        left join tb_job tj on tj.id = e.jid
+        left join tb_dept td on td.id = e.did
+
+        <where>
+            <if test="name !=null">
+                ar.name like concat('%',#{name},'%')
+            </if>
+            <if test="beginTime!=null">
+                and  DATE_FORMAT(date, "%Y-%m-%d") >= DATE_FORMAT(#{beginTime}, "%Y-%m-%d")
+            </if>
+            <if test="endTime!=null">
+                and  DATE_FORMAT(date,"%Y-%m-%d") &lt; DATE_FORMAT(#{endTime},"%Y-%m-%d")
+            </if>
+
+        </where>
+        group by ar.id
+    </select>
+
+    <insert id="addReimbursement" parameterType="entity.Reimbursement">
+        insert into apply_reimbursement (
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                name,
+            </if>
+            <if test="money != null">
+                money,
+            </if>
+            <if test="date != null">
+                date,
+            </if>
+            <if test="employee_id != null">
+                employee_id,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+        </trim>
+        ) values (
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="money != null">
+                #{money},
+            </if>
+            <if test="date != null">
+                #{date},
+            </if>
+            <if test="employee_id != null">
+                #{employee_id},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+        </trim>
+        )
+    </insert>
+</mapper>

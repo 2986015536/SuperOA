@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>公告图表</title>
+    <script src="../../js/echarts.min.js"></script>
+    <script src="../../js/jquery-1.12.2.min.js"></script>
+</head>
+<body>
+
+    <div id="dateEcharts" style="float:left; width: 800px;height:600px;"></div>
+    <div id="yuanzhu"  style="float:left;width: 800px;height:600px;"></div>
+</body>
+</html>
+<script type="text/javascript">
+    $(function () {
+        ADD();
+        admin();
+    });
+
+    var d;
+    var s;
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('dateEcharts'));
+    var yuanzhu = echarts.init(document.getElementById('yuanzhu'));
+
+    function ADD() {
+        $.ajax({
+            async: false,//设置为同步请求
+            type:"post",
+            url:"/SuperOA/advices/echarts.do",
+            success:function (data) {
+
+                // console.log(data.info.ctime)
+                d = data.info.ctime;
+
+
+                // console.log(data.info.sums)
+                s = data.info.sums;
+// 指定图表的配置项和数据
+                var option = {
+                    title: {
+                        text: '每日发送公告的数量'
+                    },
+                    tooltip: {},
+                    legend: {
+                        data:['数量']
+                    },
+                    xAxis: {
+                        data: d,
+                    },
+                    yAxis: {},
+                    series: [{
+                        name: '数量',
+                        type: 'bar',
+                        data: s,
+                    }]
+                };
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+
+
+                // console.log(d);
+                // console.log(s);
+            },
+            error:function () {
+                alert("请求过程出错")
+            }
+        });
+    };
+    var ad = [];
+    function admin() {
+        $.ajax({
+            async: false,//设置为同步请求
+            type:"post",
+            url:"/SuperOA/advices/echartsAdmin.do",
+            success:function (data) {
+                console.log(data)
+
+
+
+                ad = data.info.slice();
+
+                console.log(ad)
+                option1 = {
+                    title: {
+                        text: '每个管理员总计发表的公告数量',
+                        subtext: '仅供参考，不做证据',
+                        left: 'center'
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{a} <br/>{b} : {c} ({d}%)'
+                    },
+                    legend: {
+                        left: 'center',
+                        top: 'bottom',
+                        //data: ['rose1', 'rose2', 'rose3', 'rose4', 'rose5', 'rose6', 'rose7', 'rose8']
+                    },
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            mark: {show: true},
+                            dataView: {show: true, readOnly: false},
+                            magicType: {
+                                show: true,
+                                type: ['pie', 'funnel']
+                            },
+                            restore: {show: true},
+                            saveAsImage: {show: true}
+                        }
+                    },
+                    series: [
+                        {
+                            name: '该管理员发布的公告数量和算占比例',
+                            type: 'pie',
+                            radius: [20, 110],
+                            center: ['25%', '50%'],
+                            roseType: 'radius',
+                            label: {
+                                show: false
+                            },
+                            emphasis: {
+                                label: {
+                                    show: true
+                                }
+                            },
+                            data: ad,
+                        },
+                        {
+                            name: '该管理员发布的公告数量和算占比例',
+                            type: 'pie',
+                            radius: [30, 110],
+                            center: ['75%', '50%'],
+                            roseType: 'area',
+                            data: ad,
+                        }
+                    ]
+                };
+
+
+                yuanzhu.setOption(option1);
+            }
+
+        });
+    };
+
+
+
+
+
+
+
+
+</script>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>职位图表</title>
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all">
+    <script src="../../layui/layui.js"></script>
+    <script src="../../js/echarts.min.js"></script>
+    <script src="../../js/jquery-3.1.1.min.js"></script>
+    <style>
+        #dvtbusers{
+            width: 80%;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+<!-- 列表 -->
+<div >
+    <table id="dvusers" lay-filter="test"></table>
+</div>
+<br><br>
+<div>
+    <button class="layui-btn" onclick="refreshEcharts()">刷新图表</button>
+    <button class="layui-btn" onclick="loadEcharts()">下载图表数据</button>
+</div>
+<br><br>
+<div id="dvtbusers"></div>
+<script>
+    var echarts1 = echarts.init(document.getElementById("dvtbusers"));
+
+    var option1={
+        title:{
+            text:"各职位人数",
+            link:"https://www.acwing.com/"
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {
+            data: ['职位人数']
+        },
+        toolbox: {
+            show: true,
+            feature: {
+                dataZoom: {yAxisIndex: 'none'},
+                dataView: {readOnly: false},
+                magicType: {type: ['line', 'bar']},
+                restore: {},
+                saveAsImage: {}
+            }
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {formatter: '{value}'}
+        },
+        series: [
+            {
+                name: '各职位人数',
+                type: 'line',
+                data: [11, 11, 15, 13, 12, 13, 10],
+            }
+        ]
+    };
+
+    echarts1.setOption(option1);
+
+    $.ajax({
+        url:"../../job/showJobChart.do",
+        method:"get",
+        success:function(date){
+            option1.xAxis.data=date.info.name;
+            option1.series[0].data=date.info.jobCount;
+            echarts1.setOption(option1);
+        }
+    });
+
+    function refreshEcharts(){
+        $.ajax({
+            url:"../../job/showJobChart.do",
+            method:"get",
+            success:function(date){
+                option1.xAxis.data=date.info.name;
+                option1.series[0].data=date.info.jobCount;
+                echarts1.setOption(option1);
+            }
+        });
+    }
+
+    function loadEcharts() {
+        window.location.href = "../../job/loadJobChart.do";
+    }
+</script>
+</body>
+</html>

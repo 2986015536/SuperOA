@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.AdviceDao">
+    <select id="selectByUid" parameterType="entity.Advice" resultType="vo.AdviceVO">
+        select a.id, a.content,a.createDate,a.title,u.username
+        from tb_advice a
+        left join tb_user u on u.id = a.uid
+        <where>
+            <if test="content != null">
+                and content like concat ('%', #{content}, '%')
+            </if>
+            <if test="title != null">
+                and title like concat ('%', #{title}, '%')
+            </if>
+        </where>
+    </select>
+    <update id="updateAdvice" parameterType="entity.Advice">
+        update tb_advice
+        <set>
+            <if test="content != null">
+                content = #{content},
+            </if>
+            <if test="title != null">
+                title = #{title},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <insert id="addAdvice" parameterType="entity.Advice">
+        insert into tb_advice(
+        <trim suffixOverrides=",">
+            <if test="content != null">
+                content,
+            </if>
+            <if test="title != null">
+                title,
+            </if>
+            <if test="createDate != null">
+                createDate,
+            </if>
+            <if test="uid != null">
+                uid,
+            </if>
+        </trim>
+        ) values (
+        <trim suffixOverrides=",">
+            <if test="content != null">
+                #{content},
+            </if>
+            <if test="title != null">
+                #{title},
+            </if>
+            <if test="createDate != null">
+                #{createDate},
+            </if>
+            <if test="uid != null">
+                #{uid},
+            </if>
+        </trim>
+        )
+    </insert>
+    <delete id="delete" parameterType="int">
+        delete from tb_advice where id = #{id}
+    </delete>
+    <delete id="deletes" parameterType="list">
+        delete from tb_advice where id in
+        <foreach collection="list" open="(" close=")" item="id" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

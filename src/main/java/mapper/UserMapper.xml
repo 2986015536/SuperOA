@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dao.UserDao">
+<select id="findByLoginName" parameterType="string" resultType="entity.User">
+        select * from tb_user where loginname = #{loginname}
+    </select>
+<select id="selectAllUser" resultType="entity.User">
+        select * from  tb_user
+    </select>
+    <update id="updateUser" parameterType="entity.User">
+        update tb_user
+        <set>
+            <if test="createDate !=null">
+                createDate = #{createDate},
+            </if>
+            <if test="loginDate !=null">
+                loginDate = #{loginDate},
+            </if>
+            <if test="loginname !=null">
+                loginname = #{loginname},
+            </if>
+            <if test="password !=null">
+                password = #{password},
+            </if>
+            <if test="status !=null">
+                status = #{status},
+            </if>
+            <if test="imgPath !=null">
+                imgPath = #{imgPath},
+            </if>
+            <if test="username !=null">
+                username = #{username},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <select id="selectById" parameterType="int" resultType="entity.User">
+        select * from tb_user where id = #{id}
+    </select>
+
+    <delete id="deleteById" parameterType="list">
+        delete from tb_user where id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="addUser" parameterType="entity.User">
+        insert into tb_user (
+        <trim suffixOverrides=",">
+            <if test="createDate != null">
+                createDate,
+            </if>
+            <if test="loginDate != null">
+                loginDate,
+            </if>
+            <if test="loginname != null">
+                loginname,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="imgPath != null">
+                imgPath,
+            </if>
+            <if test="username != null">
+                username,
+            </if>
+        </trim> ) values (
+         <trim suffixOverrides=",">
+             <if test="createDate != null">
+                 #{createDate},
+             </if>
+             <if test="loginDate != null">
+                 #{loginDate},
+             </if>
+             <if test="loginname != null">
+                 #{loginname},
+             </if>
+             <if test="password != null">
+                 #{password},
+             </if>
+             <if test="status != null">
+                 #{status},
+             </if>
+             <if test="imgPath != null">
+                 #{imgPath},
+             </if>
+             <if test="username != null">
+                 #{username},
+             </if>
+         </trim>
+        )
+    </insert>
+    <select id="selectByStatus" parameterType="int" resultType="entity.User">
+        select * from tb_user where status = #{status}
+    </select>
+</mapper>

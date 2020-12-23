@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>人事管理系统</title>
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <script src="../../layui/layui.js"></script>
+    <script src="../../js/jquery-1.12.2.min.js"></script>
+
+    <style type="text/css">
+        #formDept {
+            margin-left: 10px;
+            margin-top: 30px;
+        }
+
+    </style>
+</head>
+<body>
+<ins class="adsbygoogle" style="display:inline-block;width:970px;height:50px" data-ad-client="ca-pub-6111334333458862"
+     data-ad-slot="3820120620"></ins>
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+    <legend>增加报销信息</legend>
+</fieldset>
+<form class="layui-form" id="formDept" lay-filter="example" onsubmit="return false">
+    <div class="layui-form">
+
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">申报项目名:</label>
+                <div class="layui-input-inline">
+                    <input type="text" lay-verify="name||required" class="layui-input" name="name" id="name"
+                           autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">申报金额:</label>
+                <div class="layui-input-inline">
+                    <input type="number" lay-verify="money||required" class="layui-input" name="money" id="money"
+                           autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">申报人id:</label>
+                <div class="layui-input-inline">
+                    <input type="number" lay-verify="employee_id||required" class="layui-input" name="employee_id" id="employee_id"
+                           autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">创建日期:</label>
+                <div class="layui-input-inline">
+                    <input type="text" lay-verify="date||required" class="layui-input" name="date" id="date"
+                           autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">当前状态:</label>
+                <div class="layui-input-inline">
+                    <input type="text" lay-verify="status||required" class="layui-input" name="status" id="status"
+                           autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<script src="../../js/jquery-3.1.1.min.js" charset="UTF-8"></script>
+<script src="../../layui/layui.js" charset="UTF-8"></script>
+<script type="text/javascript">
+    layui.use(['form', 'layer', 'laydate'], function () {
+        var form = layui.form,
+            laydate = layui.laydate,//日期组件
+            layer = layui.layer;
+
+        laydate.render({
+            elem: '#date'
+            , theme: '#FF0000'
+        });
+
+
+        form.verify({
+            name: function (value) {
+                if (value.length >= 20) {
+                    return '项目名过长';
+                }
+            },
+            employee_id: function (value) {
+                if (value <= 0) {
+                    return 'id不合法';
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(formDemo)', function () {
+            $.ajax({
+                url: "../../reim/addReimbursement.do",
+                data: $("form").serialize(),
+                type: 'post',
+                success: function (data) {
+                    if (data.code == 1) {
+                        layer.msg('添加成功', {icon: 1});
+                        // setTimeout(function () {
+                        //     window.location.href = "selectDept.do";
+                        // }, 2000);
+                    } else {
+                        alert($("form").serialize());
+                        layer.msg("添加失败", {icon: 2});
+                    }
+                },
+                error: function () {
+                    layer.msg("添加失败", {icon: 2});
+                }
+            })
+        })
+    });
+</script>
+</body>
+</html>

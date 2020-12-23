@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>展示员工职位</title>
+    <link rel="stylesheet" href="../../css/bootstrap.min.css" type="text/css" charset="UTF-8"/>
+    <link rel="stylesheet" href="../../css/flat-ui.css" type="text/css" charset="UTF-8"/>
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <script src="../../layui/layui.js"></script>
+    <script type="text/javascript" src="../../js/jquery-1.12.2.min.js"></script>
+    <style type="text/css">
+        .form-group {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="content">
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <div class="demoTable" style="text-align: center">
+                搜索领导下职员情况：
+                <div class="layui-inline">
+                    <input class="layui-input" name="leadName" id="demoReload1" >
+                </div>
+                <button class="layui-btn" data-type="reload">搜索</button>
+            </div>
+            <br>
+            <div class="demoTable" style="text-align: center">
+                搜索部门下员工情况：
+                <div class="layui-inline">
+                    <input class="layui-input" name="position" id="demoReload2" autocomplete="off">
+                </div>
+                <button class="layui-btn" data-type="reload">搜索</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/html" id="toolbarDemo">
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>
+            <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>
+            <button class="layui-btn layui-btn-sm" lay-event="isAll">验证是否全选</button>
+            <button class="layui-btn layui-btn-sm" lay-event="deleteLotsInfo">批量删除</button>
+        </div>
+    </script>
+
+    <table class="layui-hide" id="test" lay-filter="test"></table>
+</div>
+
+<div class="layui-form" id="updateJobInfo" style="display:none;">
+    <div class="form-group" style="text-align: center">
+        <br><br><br>
+        <label>员工所在部门修改为:
+            <div class="layui-form-item">
+                <div class="layui-input-inline" style="width: 145px">
+                    <select id="sel" lay-filter="sel">
+                        <option>请选择</option>
+                    </select>
+                </div>
+            </div>
+        </label>
+    </div>
+    <div class="form-group" style="text-align: center">
+        <button class="btn-sm btn btn-primary" type="button" lay-submit="" lay-filter="insert">修改</button>
+    </div>
+</div>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+</body>
+<script>
+    selrender();
+    var jobId = $("#sel").val();
+    // 单个下拉框渲染
+    function selrender() {
+        layui.use(['form', 'upload'], function () {
+            var $ = layui.jquery
+                , upload = layui.upload;
+            var form = layui.form;
+            //渲染部门选择下拉框
+            $("#sel").html("");
+            var html = "";
+            $.ajax({
+                url: '../../job/selectJobName.do',
+                success: function (data) {
+                    html += "<option value=''>---请选择---</option>";
+                    for (i = 0; i < data.info.length; i++) {
+                        html += ("<option value='" + data.info[i].id + "'>" + data.info[i].name + "</option>")
+                    }
+                    $("#sel").append(html);
+                    form.render('select');
+                }
+            });
+        });
+    }
+
+    //获取下拉框选择的id
+    layui.use(['form', 'upload'], function () {
+        var $ = layui.jquery
+            , upload = layui.upload;
+        form = layui.form;
+        form.on('select(sel)', function (data) {
+            jobId = data.value;
+        });
+    });
+
+    layui.use(['table', 'laypage', 'layer', 'carousel', 'upload', 'element', 'slider', 'form'], function(){
+        //初始化table组件对象
+        var table = layui.table
+            ,laypage = layui.laypage/*分页*/
+            ,layer = layui.layer//弹窗
+            ,element = layui.element//元素操作
+            ,form = layui.form;
+
+        //渲染table
+        table.render({
+            //找到table  id叫test的组件
+            elem: '#test'
+            ,id: "transForTable"
+            ,url:'../../job/selectJob.do'
+            ,totalRow: true
+            //这个很关键，就是解析 json数据库中数据的 一定要注意键值
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,cols: [[
+                {type:'checkbox', fixed: 'left'}
+                ,{field:'id', title:'用户ID', sort:true}
+                ,{field:'employeeName', title:'用户'}
+                ,{field:'jobName', title:'职称'}
+                ,{field:'jobRemanrk', title:'职责'}
+                ,{field:'deptName', title:'所属部门'}
+                ,{field:'adminName', title:'所属领导'}
+                ,{fixed: 'right', title:'操作', align:'center', toolbar: '#barDemo'}
+            ]]
+            ,page: true//分页开启
+        });
+
+        //头工具栏事件
+        table.on('toolbar(test)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'getCheckData':
+                    var data = checkStatus.data;
+                    layer.alert(JSON.stringify(data));
+                    break;
+                case 'getCheckLength':
+                    var data = checkStatus.data;
+                    layer.msg('选中了：'+ data.length + ' 个');
+                    break;
+                case 'isAll':
+                    layer.msg(checkStatus.isAll ? '全选': '未全选');
+                    break;
+                case 'deleteLotsInfo':
+                    var data = checkStatus.data;
+
+                    if(data.length !== 0){
+                        var ids = [];
+
+                        for (var i = 0; i < data.length; i++) {
+                            ids[i] = data[i].id;
+                        }
+
+                        var didArr = JSON.stringify(ids);
+
+                        $.ajax({
+                            url:"../../job/deleteLotsJob.do",
+                            type:"post",
+                            data:{"ids":didArr},
+                            dataType:'json',
+                            success:function(res) {
+                                if(res.code === 1) {
+                                    alert("删除成功！");
+                                    window.location.reload();
+                                } else {
+                                    layer.alert(res.info);
+                                }
+                            },
+                            error: function() {
+                                alert("请求错误");
+                            }
+                        });
+                    } else {
+                        layer.msg("未选取任何数据", {icon: 2});
+                    }
+                    break;
+
+                //自定义头工具栏右侧图标 - 提示
+                case 'LAYTABLE_TIPS':
+                    layer.alert('这是工具栏右侧自定义的一个图标按钮');
+                    break;
+            }
+        });
+
+        var table = layui.table;
+        //监听工具条
+        var data;
+        table.on('tool(test)', function(obj){
+            data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('真的删除么', function(index){
+                    $.ajax({
+                        type: "post",
+                        url: "../../job/deleteJobInfo.do",
+                        data: data,
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.code === 1) {
+                                window.location.reload();
+                            } else {
+                                layer.msg('删除失败');
+                            }
+                        }
+                    });
+                    layer.close(index);
+                });
+            } else if(obj.event === 'edit'){
+                layer.open({
+                    //layer提供了5种层类型。可传入的值有：0（信息框，默认）1（页面层）2（iframe层）3（加载层）4（tips层）
+                    type: 1,
+                    title: "修改信息",
+                    area: ['520px', '330px'],
+                    content: $("#updateJobInfo")//引用的弹出层的页面层的方式加载修改界面表单
+                });
+            }
+        });
+
+        var $ = layui.$, active = {
+            getCheckData: function(){ //获取选中数据
+                var checkStatus = table.checkStatus('test')
+                    ,data = checkStatus.data;
+                layer.alert(JSON.stringify(data));
+            }
+            ,getCheckLength: function(){ //获取选中数目
+                var checkStatus = table.checkStatus('test')
+                    ,data = checkStatus.data;
+                layer.msg('选中了：'+ data.length + ' 个');
+            }
+            ,isAll: function(){ //验证是否全选
+                var checkStatus = table.checkStatus('test');
+                layer.msg(checkStatus.isAll ? '全选': '未全选')
+            }
+            ,reload: function () {
+                //执行重载
+                table.reload('transForTable', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    //需要额外提交的参数
+                    , where: {
+                        leadName: $("#demoReload1").val(),
+                        position: $("#demoReload2").val()
+                    }
+                });
+            }
+        };
+
+        /*监听模糊查询搜索框*/
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //监听提交
+        form.on('submit(insert)', function () {
+            var url = "../../employee/update.do";
+            var param = {
+                flag: 2,
+                id: data.id,
+                jid: jobId
+            };
+            $.ajax({
+                url: url,
+                data: param,
+                type: 'post',
+                success: function (data) {
+                    if (data.code === 1) {
+                        layer.msg('修改成功', {icon: 1});
+                        setTimeout(function () {
+                            location.reload();
+                        }, 2000);
+                    }
+                },
+                error: function () {
+                    layer.msg("修改失败", {icon: 2});
+                }
+            })
+        })
+    });
+</script>
+</html>

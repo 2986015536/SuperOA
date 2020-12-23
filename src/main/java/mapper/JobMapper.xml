@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.JobDao">
+    <select id="allJobDao" parameterType="map" resultType="vo.JobInfoVO">
+        select tb_employee.id, tb_employee.name employeeName, tb_job.name jobName, tb_job.remark jobRemak,tb_user.loginname adminName, tb_dept.name deptName
+        from tb_employee
+        left join tb_job on tb_employee.jid = tb_job.id
+        left join tb_user on tb_employee.uid = tb_user.id
+        left join tb_dept on tb_employee.did = tb_dept.id
+        <where>
+            <if test="leadName != null">
+                <!--CONCAT(#{leadName}, '%') 字符串拼接然后进行模糊查询-->
+                and tb_user.loginname like CONCAT(#{leadName}, '%')
+            </if>
+            <if test="position != null">
+                and tb_dept.name like CONCAT(#{position}, '%')
+            </if>
+        </where>
+        ORDER BY tb_employee.id asc
+    </select>
+
+    <select id="selectJobName" resultType="entity.Job">
+        select * from tb_job
+    </select>
+
+    <insert id="addJob" parameterType="entity.Job">
+        insert  into tb_job (
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                name,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        ) values  (
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="remark != null">
+                #{remark},
+            </if>
+        </trim>
+        )
+
+    </insert>
+
+    <delete id="deleteJobInfo" parameterType="int">
+        delete from tb_employee where id = #{id}
+    </delete>
+
+    <delete id="deleteLotsJob" parameterType="list">
+        delete from tb_employee where id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

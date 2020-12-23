@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+
+    <link href="../css/animate.css" rel="stylesheet">
+    <link href="../css/style.css?v=4.1.0" rel="stylesheet">
+</head>
+<body class="gray-bg">
+<div class="middle-box text-center animated fadeInDown">
+    <h2 class="font-bold"><span id="userName"></span></h2>
+    <div class="text-left fadeInDown" style="width: 700px">
+        <hr style="color: black;">
+        <p>
+        <h3>我不停的向系统申请空间．．．</h3></p><p>
+        <h3>但却捕获一个异常－－－你爱的人不爱我．．．</h3></p>
+        <p>
+        <h3> 为了解决这个异常．．． </h3></p>
+        <p>
+        <h3> 我愿意虚拟出最后一点内存．．．</h3></p>
+        <p>
+        <h3> 把所有我能实现的方法地址压入堆栈．．．</h3></p>
+        <p>
+        <h3> 并且在栈尾压入最后一个方法－－ </h3></p>
+        <p>
+        <h3> 将字符串＂我爱你，你爱我吗？＂传递给你．．． </h3></p>
+        <p>
+        <h3> 如果返回值为真－－我将用尽一生去爱你．．．</h3></p>
+        <p>
+        <h3> 否则－－我将释放掉所有系统资源</h3></p>
+    </div>
+
+</div>
+<!-- 全局js -->
+<script src="../js/jquery.min.js?v=2.1.4"></script>
+<script src="../js/bootstrap.min.js?v=3.3.6"></script>
+<script>
+    $.post("/SuperOA/user/queryName.do",function(obj){
+        $("#userName").html(obj.info.username + " " + " 欢迎你");
+    },"json");
+</script>
+</body>
+</html>

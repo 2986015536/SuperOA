@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="layui/css/layui.css" media="all">
+    <script src="layui/layui.js"></script>
+    <script src="js/echarts.min.js"></script>
+    <script src="js/jquery-3.1.1.min.js"></script>
+    <style>
+        #dvtbusers{
+            width: 80%;
+            height: 500px;
+        }
+        #dvtbusers2{
+            width: 80%;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+<!--&lt;!&ndash; 列表 &ndash;&gt;-->
+<!--<div >-->
+<!--    <table id="dvusers" lay-filter="test"></table>-->
+<!--</div>-->
+<div><button class="layui-btn" onclick="loadEcharts()">刷新图表</button></div>
+<a href="after/dept/downloadExcel.do">下载数据</a>
+<!--<div  id="dvtbusers" ></div>-->
+<div  id="dvtbusers2" ></div>
+
+<script>
+
+    // layui.use(['table'], function(){
+    //     var table = layui.table;
+    //     //第一个实例
+    //     table.render({
+    //         elem: '#dvusers'
+    //         ,height: 312
+    //         ,url: 'after/dept/selectDept.do' //数据接口
+    //         ,page: {theme: '#888888', layout: ['limit', 'count', 'prev', 'page', 'next', 'skip']}//分页开启
+    //         ,cols: [[ //表头
+    //             {field:'id', title:'部门编号', width:200,  unresize: true, sort: true, fixed:"left"}
+    //             ,{field:'dname', title:'部门名', width:100, sort: true}
+    //             ,{field:'remark', title:'简介', width:200,sort: true}
+    //             ,{field:'count', title:'部门人数', width:200,sort: true}
+    //         ]]
+    //     });
+    // });
+    //
+    // var echarts1=echarts.init(document.getElementById("dvtbusers"));
+    // var option1={
+    //     title:{
+    //         text:"各部门人数",
+    //         link:"http://www.baidu.com"
+    //     },
+    //     tooltip: {
+    //         trigger: 'axis'
+    //     },
+    //     legend: {
+    //         data: ['部门人数']
+    //     },
+    //     toolbox: {
+    //         show: true,
+    //         feature: {
+    //             dataZoom: {
+    //                 yAxisIndex: 'none'
+    //             },
+    //             dataView: {readOnly: false},
+    //             magicType: {type: ['line', 'bar']},
+    //             restore: {},
+    //             saveAsImage: {}
+    //         }
+    //     },
+    //     xAxis: {
+    //         type: 'category',
+    //         boundaryGap: false,
+    //         data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+    //     },
+    //     yAxis: {
+    //         type: 'value',
+    //         axisLabel: {
+    //             formatter: '{value}'
+    //         }
+    //     },
+    //     series: [
+    //         {
+    //             name: '部门人数',
+    //             type: 'line',
+    //             data: [11, 11, 15, 13, 12, 13, 10],
+    //         }
+    //     ]
+    // };
+    // echarts1.setOption(option1);
+
+
+    var echarts2=echarts.init(document.getElementById("dvtbusers2"));
+    var option = {
+        title: {
+            text: '基础雷达图'
+
+        },
+        tooltip: {},
+        legend: {
+            data: ['部门人数']
+        },
+        radar: {
+            // shape: 'circle',
+            name: {
+                textStyle: {
+                    color: '#fff',
+                    backgroundColor: '#999',
+                    borderRadius: 3,
+                    padding: [3, 5],
+                    fontStyle :'italic',
+
+                }
+            },
+            indicator: [
+                { name: '1（sales）', max: 35},
+                { name: '1（Administration）', max: 35},
+                { name: '1（1 Techology）', max:35},
+                { name: '1（Customer Support）', max: 35},
+                { name: '1（Development）', max: 35},
+                { name: '1（Marketing）', max: 35},
+                { name: '1（Marketing）', max: 35},
+            ]
+        },
+        series: [{
+            name: '部门人数',
+            type: 'radar',
+            // areaStyle: {normal: {}},
+            data: [
+                {
+                    value: [0, 0, 0, 0, 0, 0,0],
+                    name: '部门人数'
+                }
+            ]
+        }]
+    };
+    echarts2.setOption(option);
+
+
+
+    function loadEcharts(){
+        // $.get()
+        // $.post();
+        $.ajax({
+            url:"after/dept/showEcharts.do",
+            method:"get",
+            success:function(r){
+                // console.log(r);
+                // option1.xAxis.data=r.deptName;
+                // option1.series[0].data=r.deptCount;
+
+
+                // console.log(option.radar.indicator[0]);
+                for (var i=0;i<r.deptName.length;i++) {
+                    option.radar.indicator[i].name=r.deptName[i];
+                }
+
+
+                // console.log(option.series[0].data[0].value);
+                for (var i=0;i<r.deptName.length;i++) {
+                    option.series[0].data[0].value[i] = r.deptCount[i];
+                }
+
+                // console.log(option1);
+                // echarts1.setOption(option1);
+
+
+                // console.log(option);
+                echarts2.setOption(option);
+            }
+        })
+    }
+</script>
+</body>
+</html>
