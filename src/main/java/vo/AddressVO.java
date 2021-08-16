@@ -1,6 +1,7 @@
 package vo;
 
 public class AddressVO {
+    private Integer add;
     private Integer addressId;
     private String addressCode;
     private String addressName;
